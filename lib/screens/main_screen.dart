@@ -201,6 +201,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   onSaved: (value) {
                                     userName = value!;
                                   },
+                                  onChanged: (value) {
+                                    userName = value;
+                                  },
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 4) {
                                       return 'Please enter at least 4 characters';
@@ -241,9 +244,13 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   height: 8,
                                 ),
                                 TextFormField(
+                                  keyboardType: TextInputType.emailAddress,
                                   key: ValueKey(2),
                                   onSaved: (value) {
                                     userEmail = value!;
+                                  },
+                                  onChanged: (value) {
+                                    userEmail = value;
                                   },
                                   validator: (value) {
                                     if (value!.isEmpty ||
@@ -286,9 +293,13 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   height: 8,
                                 ),
                                 TextFormField(
+                                  obscureText: true,
                                   key: ValueKey(3),
                                   onSaved: (value) {
                                     userPassword = value!;
+                                  },
+                                  onChanged: (value) {
+                                    userPassword = value;
                                   },
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 6) {
