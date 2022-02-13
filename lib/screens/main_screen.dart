@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'package:chat_app_with_firebase/screens/chat_screen.dart';
 import 'package:chat_app_with_firebase/config/palette.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginSignupScreen extends StatefulWidget {
   const LoginSignupScreen({Key? key}) : super(key: key);
@@ -9,6 +13,7 @@ class LoginSignupScreen extends StatefulWidget {
 }
 
 class _LoginSignupScreenState extends State<LoginSignupScreen> {
+  final _authentication = FirebaseAuth.instance;
   bool isSignupScreen = true;
   final _formkey = GlobalKey<FormState>();
   String userName = "";
@@ -353,6 +358,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   onSaved: (value) {
                                     userEmail = value!;
                                   },
+                                  onChanged: (value) {
+                                    userEmail = value;
+                                  },
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 4) {
                                       return 'Please enter at least 4 characters';
@@ -396,6 +404,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   key: ValueKey(5),
                                   onSaved: (value) {
                                     userPassword = value!;
+                                  },
+                                  onChanged: (value) {
+                                    userPassword = value;
                                   },
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 6) {
@@ -454,8 +465,62 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
               left: 0,
               child: Center(
                 child: GestureDetector(
-                  onTap: () {
-                    _tryValidation();
+                  onTap: () async {
+                    if (isSignupScreen) {
+                      _tryValidation();
+
+                      try {
+                        final newUser = await _authentication
+                            .createUserWithEmailAndPassword(
+                          email: userEmail,
+                          password: userPassword,
+                        );
+
+                        if (newUser.user != null) {
+                          // if sucuess move to chat_screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ChatScreen();
+                              },
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        print(e);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content:
+                                Text("Please check your email and password"),
+                            backgroundColor: Colors.blue,
+                          ),
+                        );
+                      }
+                    }
+
+                    if (!isSignupScreen) {
+                      _tryValidation();
+
+                      try {
+                        final registerdUser =
+                            await _authentication.signInWithEmailAndPassword(
+                          email: userEmail,
+                          password: userPassword,
+                        );
+
+                        if (registerdUser.user != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return ChatScreen();
+                            }),
+                          );
+                        }
+                      } catch (e) {
+                        print(e);
+                      }
+                    }
                   },
                   child: Container(
                     height: 90.0,
